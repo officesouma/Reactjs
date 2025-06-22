@@ -1,0 +1,74 @@
+mkdir -p src/components/common/Button \
+         src/components/common/Modal \
+         src/components/layouts/MainLayout \
+         src/components/layouts/AuthLayout \
+         src/features/products/components/ProductList \
+         src/features/products/hooks \
+         src/features/products/services \
+         src/features/products/types \
+         src/features/users/components/UserProfile \
+         src/features/users/hooks \
+         src/features/users/services \
+         src/features/users/types \
+         src/hooks \
+         src/routes \
+         src/services \
+         src/store/slices \
+         src/utils \
+         src/styles \
+         src/assets/images \
+         src/assets/icons \
+         src/assets/fonts \
+         src/pages \
+         src/tests/components \
+         src/tests/pages \
+         src/tests/utils
+
+touch \
+src/components/common/Button/Button.tsx \
+src/components/common/Button/Button.module.scss \
+src/components/common/Button/index.ts \
+src/components/common/Modal/Modal.tsx \
+src/components/common/Modal/Modal.module.scss \
+src/components/common/Modal/index.ts \
+src/components/layouts/MainLayout/MainLayout.tsx \
+src/components/layouts/MainLayout/MainLayout.module.scss \
+src/components/layouts/MainLayout/index.ts \
+src/components/layouts/AuthLayout/AuthLayout.tsx \
+src/components/layouts/AuthLayout/AuthLayout.module.scss \
+src/components/layouts/AuthLayout/index.ts \
+src/features/products/components/ProductList/ProductList.tsx \
+src/features/products/components/ProductList/ProductList.module.scss \
+src/features/products/components/ProductList/index.ts \
+src/features/products/hooks/useProducts.ts \
+src/features/products/services/productService.ts \
+src/features/products/types/product.ts \
+src/features/users/components/UserProfile/UserProfile.tsx \
+src/features/users/components/UserProfile/UserProfile.module.scss \
+src/features/users/components/UserProfile/index.ts \
+src/features/users/hooks/useUser.ts \
+src/features/users/services/userService.ts \
+src/features/users/types/user.ts \
+src/hooks/useAuth.ts \
+src/hooks/useDebounce.ts \
+src/hooks/index.ts \
+src/routes/AppRoutes.tsx \
+src/routes/ProtectedRoute.tsx \
+src/routes/index.ts \
+src/services/apiClient.ts \
+src/services/errorHandler.ts \
+src/store/slices/authSlice.ts \
+src/store/slices/productSlice.ts \
+src/store/hooks.ts \
+src/store/store.ts \
+src/utils/constants.ts \
+src/utils/formatters.ts \
+src/utils/helpers.ts \
+src/styles/variables.scss \
+src/styles/global.scss \
+src/pages/HomePage.tsx \
+src/pages/LoginPage.tsx \
+src/pages/ProductPage.tsx \
+src/App.tsx \
+src/main.tsx \
+src/index.html
