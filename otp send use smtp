@@ -76,8 +76,9 @@ export async function sendOtp(email: string): Promise<{ success: boolean; messag
 }
 
 
-# services/verifyOtpService.tsimport { OtpModel } from "../models/OtpModel";
+# services/verifyOtpService.ts
 
+import { OtpModel } from "../models/OtpModel";
 export async function verifyOtp(email: string, otp: string): Promise<boolean> {
   const record = await OtpModel.findOne({ email, otp });
 
