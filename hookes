@@ -1,0 +1,277 @@
+Perfect! Here's a **line-by-line explanation** of the most common React JS hooks with examples — all in **one page**. This is beginner-friendly and helps you deeply understand how each hook works.
+
+---
+
+## 🔧 1. `useState` – Add State to Functional Components
+
+```tsx
+import React, { useState } from "react";
+
+function Counter() {
+  // ✅ useState declares a state variable `count`, initialized to 0
+  const [count, setCount] = useState(0);
+
+  return (
+    <div>
+      {/* 🧾 Display current count */}
+      <p>You clicked {count} times</p>
+
+      {/* 🔁 onClick updates the state using setCount */}
+      <button onClick={() => setCount(count + 1)}>Click +</button>
+    </div>
+  );
+}
+```
+
+### ✅ Explanation:
+
+* `useState(0)` creates a state `count` with initial value `0`.
+* `setCount` updates that state.
+* Re-render happens automatically when state changes.
+
+---
+
+## 🔄 2. `useEffect` – Run Code on Mount/Update (e.g. fetch, timer)
+
+```tsx
+import React, { useEffect, useState } from "react";
+
+function Timer() {
+  const [seconds, setSeconds] = useState(0);
+
+  // ✅ useEffect runs after component renders
+  useEffect(() => {
+    // ⏱️ Set interval to increment `seconds` every 1 second
+    const interval = setInterval(() => setSeconds(s => s + 1), 1000);
+
+    // 🧹 Cleanup: stop timer when component unmounts
+    return () => clearInterval(interval);
+  }, []); // Empty deps = run only once (on mount)
+
+  return <p>Seconds: {seconds}</p>;
+}
+```
+
+---
+
+## 🌍 3. `useContext` – Global State Sharing
+
+```tsx
+import React, { createContext, useContext } from "react";
+
+// 🎯 Create a context with default value 'light'
+const ThemeContext = createContext("light");
+
+function DisplayTheme() {
+  // ✅ useContext gets current value of ThemeContext
+  const theme = useContext(ThemeContext);
+  return <p>Theme: {theme}</p>;
+}
+
+function App() {
+  // 🧩 Provide 'dark' to ThemeContext
+  return (
+    <ThemeContext.Provider value="dark">
+      <DisplayTheme />
+    </ThemeContext.Provider>
+  );
+}
+```
+
+---
+
+## 🧠 4. `useRef` – Access DOM or Persist Data Without Re-render
+
+```tsx
+import React, { useRef } from "react";
+
+function FocusInput() {
+  // ✅ useRef holds a reference to DOM node
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const focusNow = () => {
+    // ⚡ .current gives access to the DOM node
+    inputRef.current?.focus();
+  };
+
+  return (
+    <>
+      <input ref={inputRef} placeholder="Click button to focus" />
+      <button onClick={focusNow}>Focus Input</button>
+    </>
+  );
+}
+```
+
+---
+
+## 🧮 5. `useMemo` – Cache Expensive Calculations
+
+```tsx
+import React, { useMemo, useState } from "react";
+
+function FactorialCalculator() {
+  const [num, setNum] = useState(1);
+
+  // ✅ useMemo caches the result unless `num` changes
+  const factorial = useMemo(() => {
+    console.log("Calculating factorial...");
+    let result = 1;
+    for (let i = 2; i <= num; i++) result *= i;
+    return result;
+  }, [num]);
+
+  return (
+    <div>
+      <input
+        type="number"
+        value={num}
+        onChange={(e) => setNum(+e.target.value)}
+      />
+      <p>Factorial: {factorial}</p>
+    </div>
+  );
+}
+```
+
+---
+
+## ⚙️ 6. `useCallback` – Cache Functions
+
+```tsx
+import React, { useCallback, useState } from "react";
+
+function CounterButton({ onIncrement }: { onIncrement: () => void }) {
+  return <button onClick={onIncrement}>Increase</button>;
+}
+
+function App() {
+  const [count, setCount] = useState(0);
+
+  // ✅ useCallback returns memoized function unless deps change
+  const handleClick = useCallback(() => {
+    setCount((prev) => prev + 1);
+  }, []);
+
+  return (
+    <>
+      <p>Count: {count}</p>
+      <CounterButton onIncrement={handleClick} />
+    </>
+  );
+}
+```
+
+---
+
+## ⚖️ 7. `useReducer` – Complex State (like Redux)
+
+```tsx
+import React, { useReducer } from "react";
+
+// Reducer logic to update state
+function reducer(state: number, action: { type: "inc" | "dec" }) {
+  switch (action.type) {
+    case "inc":
+      return state + 1;
+    case "dec":
+      return state - 1;
+    default:
+      return state;
+  }
+}
+
+function Counter() {
+  // ✅ useReducer takes a reducer function and initial value
+  const [count, dispatch] = useReducer(reducer, 0);
+
+  return (
+    <>
+      <p>Count: {count}</p>
+      <button onClick={() => dispatch({ type: "inc" })}>+</button>
+      <button onClick={() => dispatch({ type: "dec" })}>-</button>
+    </>
+  );
+}
+```
+
+---
+
+## ⚡ 8. `useLayoutEffect` – Run Synchronously Before Paint
+
+```tsx
+import React, { useLayoutEffect, useRef } from "react";
+
+function Box() {
+  const boxRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    // ✅ Happens before screen paint
+    if (boxRef.current) {
+      boxRef.current.style.backgroundColor = "yellow";
+    }
+  }, []);
+
+  return <div ref={boxRef}>Watch background on load</div>;
+}
+```
+
+---
+
+## 🚀 9. `useImperativeHandle` – Expose Methods from Child to Parent
+
+```tsx
+import React, {
+  useRef,
+  useImperativeHandle,
+  forwardRef,
+} from "react";
+
+// ✅ Custom input component exposing `focus` method
+const MyInput = forwardRef((_, ref) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    focus: () => inputRef.current?.focus(),
+  }));
+
+  return <input ref={inputRef} />;
+});
+
+function Parent() {
+  const inputRef = useRef<{ focus: () => void }>(null);
+
+  return (
+    <>
+      <MyInput ref={inputRef} />
+      <button onClick={() => inputRef.current?.focus()}>Focus from parent</button>
+    </>
+  );
+}
+```
+
+---
+
+## ✅ Summary Table
+
+| Hook                  | Purpose                             |
+| --------------------- | ----------------------------------- |
+| `useState`            | Local state                         |
+| `useEffect`           | Side effects                        |
+| `useContext`          | Share global state                  |
+| `useRef`              | Access DOM or persist mutable value |
+| `useMemo`             | Cache expensive calculations        |
+| `useCallback`         | Cache functions                     |
+| `useReducer`          | Manage complex state like Redux     |
+| `useLayoutEffect`     | Layout effect before browser paint  |
+| `useImperativeHandle` | Call child methods from parent      |
+
+---
+
+Would you like this as:
+
+* A downloadable PDF 📄?
+* A working CodeSandbox project?
+* Cheatsheet with only syntax for revision?
+
+Let me know and I’ll generate it for you!
