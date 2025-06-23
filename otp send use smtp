@@ -1,0 +1,111 @@
+
+
+
+npm install nodemailer mongoose
+npm install --save-dev @types/nodemailer @types/mongoose
+
+
+
+# ***models/OtpModel.ts***
+import mongoose, { Document, Schema } from "mongoose";
+
+export interface OtpDocument extends Document {
+  email: string;
+  otp: string;
+  createdAt: Date;
+  expiresAt: Date;
+}
+
+const otpSchema = new Schema<OtpDocument>({
+  email: { type: String, required: true },
+  otp: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now },
+  expiresAt: { type: Date, required: true },
+});
+
+export const OtpModel = mongoose.model<OtpDocument>("Otp", otpSchema);
+
+
+# utils/mailer.ts
+import nodemailer from "nodemailer";
+
+export const transporter = nodemailer.createTransport({
+  host: "smtp.example.com", // e.g., smtp.gmail.com
+  port: 587,
+  secure: false, // true for 465, false for 587
+  auth: {
+    user: "your@email.com",
+    pass: "your-app-password",
+  },
+});
+
+export async function sendEmail(to: string, subject: string, html: string) {
+  return transporter.sendMail({
+    from: '"YourApp" <your@email.com>',
+    to,
+    subject,
+    html,
+  });
+}
+# services/sendOtpService.ts
+
+import { OtpModel } from "../models/OtpModel";
+import { sendEmail } from "../utils/mailer";
+
+export async function sendOtp(email: string): Promise<{ success: boolean; message: string }> {
+  try {
+    // Generate 6-digit numeric OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Set expiry time (e.g., 10 minutes)
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    // Save to DB
+    await OtpModel.create({ email, otp, expiresAt });
+
+    // Send email
+    const subject = "Your OTP Code";
+    const html = `<p>Your OTP code is <strong>${otp}</strong></p><p>It will expire in 10 minutes.</p>`;
+    await sendEmail(email, subject, html);
+
+    return { success: true, message: "OTP sent successfully" };
+  } catch (error: any) {
+    console.error("Error sending OTP:", error);
+    return { success: false, message: "Failed to send OTP" };
+  }
+}
+
+
+# services/verifyOtpService.tsimport { OtpModel } from "../models/OtpModel";
+
+export async function verifyOtp(email: string, otp: string): Promise<boolean> {
+  const record = await OtpModel.findOne({ email, otp });
+
+  if (!record) return false;
+
+  if (record.expiresAt < new Date()) {
+    await OtpModel.deleteOne({ _id: record._id });
+    return false;
+  }
+
+  // Optional: delete OTP after successful verification
+  await OtpModel.deleteOne({ _id: record._id });
+
+  return true;
+}
+
+
+ # Controller or Route
+
+import express from "express";
+import { sendOtp } from "./services/sendOtpService";
+
+const router = express.Router();
+
+router.post("/send-otp", async (req, res) => {
+  const { email } = req.body;
+  const result = await sendOtp(email);
+  res.status(result.success ? 200 : 500).json(result);
+});
+
+export default router;
