@@ -1,0 +1,136 @@
+get api base_url/api/group_owner/votepackge/:id/package_price_id
+
+
+// File: VotePackageList.tsx
+import React, { useEffect, useState } from "react";
+import DataTable, { TableColumn } from "react-data-table-component";
+
+// ------------------------------------------------------------
+// ✅ Type Definition for Each Row of Data (Vote Package Example)
+interface VotePackage {
+  _id: string;
+  name: string;
+  price: number;
+  duration: number;
+  description?: string;
+}
+
+// ------------------------------------------------------------
+// ✅ Reusable Common DataTable Component
+interface CommonDataTableProps<T> {
+  title?: string;
+  data: T[];
+  columns: TableColumn<T>[];
+  loading?: boolean;
+  pagination?: boolean;
+  highlightOnHover?: boolean;
+}
+
+function CommonDataTable<T extends object>({
+  title,
+  data,
+  columns,
+  loading = false,
+  pagination = true,
+  highlightOnHover = true,
+}: CommonDataTableProps<T>) {
+  return (
+    <DataTable
+      title={title}
+      columns={columns}
+      data={data}
+      progressPending={loading}
+      pagination={pagination}
+      highlightOnHover={highlightOnHover}
+      responsive
+      persistTableHead
+    />
+  );
+}
+
+// ------------------------------------------------------------
+// ✅ Main Component: Uses CommonDataTable for Vote Package Listing
+const VotePackageList: React.FC = () => {
+  const [packages, setPackages] = useState<VotePackage[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Replace this with actual API call in real app
+  const mockFetchData = async () => {
+    setLoading(true);
+    // Simulate API delay
+    setTimeout(() => {
+      setPackages([
+        { _id: "1", name: "Basic Pack", price: 10, duration: 7 },
+        { _id: "2", name: "Premium Pack", price: 25, duration: 15 },
+        { _id: "3", name: "Pro Pack", price: 40, duration: 30 },
+      ]);
+      setLoading(false);
+    }, 1000);
+  };
+
+  useEffect(() => {
+    mockFetchData();
+  }, []);
+
+  // 🧪 Fake Delete
+  const handleDelete = (id: string) => {
+    const confirmDelete = window.confirm("Are you sure?");
+    if (confirmDelete) {
+      setPackages((prev) => prev.filter((item) => item._id !== id));
+    }
+  };
+
+  // 🧪 Fake Edit
+  const handleEdit = (item: VotePackage) => {
+    const newPrice = prompt(`Edit price for ${item.name}`, String(item.price));
+    if (newPrice) {
+      setPackages((prev) =>
+        prev.map((pkg) =>
+          pkg._id === item._id ? { ...pkg, price: parseFloat(newPrice) } : pkg
+        )
+      );
+    }
+  };
+
+  // ✅ Table Columns Definition
+  const columns: TableColumn<VotePackage>[] = [
+    {
+      name: "Name",
+      selector: (row) => row.name,
+      sortable: true,
+    },
+    {
+      name: "Price ($)",
+      selector: (row) => `$${row.price}`,
+      sortable: true,
+    },
+    {
+      name: "Duration",
+      selector: (row) => `${row.duration} days`,
+    },
+    {
+      name: "Actions",
+      cell: (row) => (
+        <div className="space-x-2">
+          <button onClick={() => handleEdit(row)} className="text-blue-500">Edit</button>
+          <button onClick={() => handleDelete(row._id)} className="text-red-500">Delete</button>
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <div className="p-4">
+      <h2 className="text-xl font-semibold mb-4">Vote Package List</h2>
+      {/* ✅ Using the CommonDataTable */}
+      <CommonDataTable
+        title="Vote Packages"
+        data={packages}
+        columns={columns}
+        loading={loading}
+      />
+    </div>
+  );
+};
+
+export default VotePackageList;
